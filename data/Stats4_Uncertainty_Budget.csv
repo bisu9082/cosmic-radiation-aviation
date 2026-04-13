@@ -1,0 +1,10 @@
+Source,Type,Standard_Uncertainty_pct,Description,Expanded_Uncertainty_95CI_pct
+TEPC counting statistics,A,0.5,Statistical counting variation (1-min bins),1.0
+TEPC energy response,B,1.0,H*(10) conversion factor uncertainty,2.0
+TEPC calibration,B,1.5,Calibration source traceability,3.0
+Liulin vs TEPC inter-device,A,2.5,RSD between TEPC and 3 Liulin units,5.0
+Route profile uncertainty (recon),B,1.0,DEG path file route reconstruction accuracy,2.0
+Route profile uncertainty (transport),B,8.0,Altitude change and multi-segment uncertainty,16.0
+Solar activity (HCP) correction,B,2.0,HCP estimation from neutron monitor data,4.0
+Total combined uncertainty (recon),Combined,2.92,Quadrature sum of B-type sources for recon,5.84
+Total combined uncertainty (transport),Combined,8.46,Quadrature sum of B-type sources for transport,16.92

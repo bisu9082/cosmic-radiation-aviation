@@ -1,0 +1,3 @@
+Model,R2,Pearson_r_altitude_logDose,p_value,Equation,Preferred_Model
+Linear,0.924,,,D = 0.2374*alt_km + -0.4986,False
+Log-Linear,0.3728,0.975,1.5463e-10,D = 0.0424 * exp(0.3350 * alt_km),True

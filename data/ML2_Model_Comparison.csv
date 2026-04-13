@@ -1,0 +1,4 @@
+Model,R2_mean,R2_std,RMSE_mean_uSvh,RMSE_std_uSvh,MAE_mean_uSvh,MAE_std_uSvh,R2_train
+Random Forest,0.99186,0.00185,0.15902,0.02653,0.08421,0.00993,0.9961
+Gradient Boosting,0.9943,0.00067,0.1333,0.01468,0.07021,0.00845,0.9996
+Ridge (log-target),0.99836,0.00017,0.05856,0.00375,0.04709,0.00363,0.99842
