@@ -1,0 +1,50 @@
+{
+  "analysis": "Tier 1.5 Latitude Extension — f_lat(Rc)",
+  "data_source": "CARI-7 representative values: Mertens 2013, Latocha 2016, Clairand 2023",
+  "policy": "No in-flight measurement data (TEPC/Liulin) used. CARI-7 physics model only.",
+  "reference": {
+    "Rc_GV": 9.96,
+    "h_km": 9.14,
+    "HCP_MV": 1141,
+    "D_uSv_h": 1.4
+  },
+  "model_comparison": {
+    "saturation": {
+      "R2": 0.9995,
+      "RMSE": 0.0169,
+      "selected": true
+    },
+    "power_law": {
+      "R2": 0.8477,
+      "RMSE": 0.295,
+      "selected": false
+    },
+    "exp_decay": {
+      "R2": 0.9904,
+      "RMSE": 0.0739,
+      "selected": false
+    }
+  },
+  "saturation_params": {
+    "a": 0.0994,
+    "a_95CI": [
+      0.0921,
+      0.154
+    ],
+    "n": 1.2891,
+    "n_95CI": [
+      1.163,
+      1.3178
+    ],
+    "bootstrap_n": 1000
+  },
+  "shapiro_wilk": {
+    "W": 0.9439,
+    "p": 0.5679
+  },
+  "cohens_d": 0.774,
+  "MARE_validation_pct": 1.15,
+  "alpha_HCP": 0.088,
+  "complete_Tier15_formula": "D(h, Rc, HCP) = D_CARI7(h, Rc_ref, HCP_ref) × [(1 + a·Rc_ref^n)/(1 + a·Rc^n)] × [1 − 0.088·ln(HCP/1141)]",
+  "formula_note": "D_CARI7 altitude anchor values from manuscript Table 1 (Rc=9.96 GV, HCP=1141 MV): 3.05 km→0.10, 6.10 km→0.79, 9.14 km→1.40, 12.19 km→2.47 µSv/h"
+}
