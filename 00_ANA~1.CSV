@@ -1,0 +1,24 @@
+Analysis_Category,Output_File,Description
+Data Files,Table1_Aircraft_AltitudeDoseRate.csv,"Aircraft types: altitude, CARI-7 dose rates, annual dose estimates"
+Data Files,Table2_MeasuredVsPredicted.csv,"3 missions: TEPC measured vs CARI-7 predicted, error rates"
+Data Files,Table3_MultiDetector_Comparison.csv,All detectors (TEPC + Liulin Ch2/3/8) per mission
+Data Files,Table4_SolarActivity_Scenarios.csv,Solar max vs solar min dose scenarios for 4 aircraft types
+Data Files,Table5_Monthly_Predictions_2025.csv,Month-by-month 2025 predictions with HCP and sunspot data
+Data Files,Table6_Altitude_DoseRate_Curve.csv,Continuous altitude-dose rate curve with fitted model
+Data Files,Table7a_TimeSeries_Reconnaissance_1121.csv,1-minute resolution time series: Recon 21 Nov (391 pts)
+Data Files,Table7b_TimeSeries_Transport_1120.csv,1-minute resolution time series: Transport 20 Nov (327 pts)
+Statistics,Stats1_Regression_Altitude_DoseRate.csv,"Linear vs log-linear regression; R², Pearson r, equation"
+Statistics,Stats2_BlandAltman_TEPC_vs_CARI7.csv,"Bland-Altman analysis: bias, LoA, relative deviation"
+Statistics,Stats3_InterInstrument_Precision.csv,RSD across detectors per mission; max deviation from TEPC
+Statistics,Stats4_Uncertainty_Budget.csv,Type A/B uncertainty sources; combined expanded uncertainty
+Statistics,Stats5a/b_Correlation_Matrix.csv,Pearson & Spearman correlation matrices
+ML,ML1_Feature_Importance.csv,"RF + GB feature importances (altitude, HCP, latitude)"
+ML,ML2_Model_Comparison.csv,"5-fold CV: R², RMSE for Random Forest, GBM, Ridge"
+ML,ML3_Aircraft_DoseRate_Predictions.csv,ML vs CARI-7 predictions for 4 aircraft types
+Figures,Figure1_Altitude_DoseRate.png/pdf,"Altitude-dose rate (log scale, exponential fit, ±uncertainty)"
+Figures,Figure2_TimeSeries_DoseRate.png/pdf,"Time-series: recon vs transport (side-by-side, 1-min data)"
+Figures,Figure3_ModelValidation.png/pdf,Measured vs predicted (scatter) + Bland-Altman (relative)
+Figures,Figure4_Monthly_SolarActivity.png/pdf,Monthly dose bar chart + sunspot number overlay
+Figures,Figure5_Annual_Dose_Regulatory.png/pdf,Annual dose estimate + regulatory limits comparison
+Figures,Figure6_MultiDetector.png/pdf,Multi-detector bar chart + relative deviation from CARI-7
+Figures,Figure7_ML_FeatureImportance.png/pdf,RF feature importance + dose prediction colored by HCP

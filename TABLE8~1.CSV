@@ -1,0 +1,5 @@
+Aircraft_Type,Sorties_Per_Year,Hours_Per_Sortie,Total_Annual_Flight_Hours,Dose_Rate_uSvh_CARI7,Annual_Dose_mSv_Nominal,Annual_Dose_mSv_SolarMin_Adjusted,Annual_Dose_mSv_Conservative_upper,Fraction_of_6mSv_Limit_pct,Exceeds_6mSv_Limit,Exceeds_1mSv_ICRP_Public
+Reconnaissance,96,7.0,672.0,2.47,1.66,1.876,2.158,27.7,False,True
+Surveillance_AWACS,72,8.0,576.0,1.4,0.806,0.911,1.048,13.4,False,False
+Aerial_Refueling,120,3.0,360.0,0.79,0.284,0.321,0.37,4.7,False,False
+Transport,200,3.0,600.0,0.1,0.06,0.068,0.078,1.0,False,False
