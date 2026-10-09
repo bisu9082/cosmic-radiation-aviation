@@ -1,4 +1,0 @@
-Mission_ID,Date,Aircraft_Type,Cruise_Altitude_ft,Flight_Duration_min,Flight_Duration_h,TEPC_Measured_uSv,CARI7_Predicted_uSv,Relative_Error_pct,Abs_Error_uSv,Within_30pct_Criterion,HCP_Value,Solar_Activity_Phase,Latitude_deg_N_approx,TEPC_Mean_DoseRate_uSvh,CARI7_Mean_DoseRate_uSvh
-Recon_1121,2025-11-21,Reconnaissance,40000,391,6.52,17.4,16.6,-4.6,0.8,True,1132,Solar Maximum,37.5,2.668711656441718,2.5460122699386507
-Recon_1123,2025-11-23,Reconnaissance,40000,385,6.42,16.3,16.7,2.5,0.4,True,1132,Solar Maximum,37.5,2.5389408099688473,2.601246105919003
-Transport_1120,2025-11-20,Transport,10000,171,2.85,0.35,0.276,-21.1,0.074,True,1132,Solar Maximum,36.5,0.12280701754385964,0.0968421052631579

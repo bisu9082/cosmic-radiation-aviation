@@ -1,0 +1,612 @@
+%=======================================================================
+%  Radioprotection (EDP Sciences / SFRP) submission
+%  Re-aimed from the rejected Space Weather manuscript 1072911.
+%  v3 (major revision): ALL dose values are real CARI-7 v4.1.3 executions
+%   - Altitude base: log-quadratic in ln D (replaces single exponential);
+%     MARE 0.10% over FL200-FL400, 1.05% over FL100-FL400
+%   - Latitude factor: direct CARI-7 runs at 11 geographic nodes
+%     (VCR 0.0-17.2 GV) + 3 held-out nodes (out-of-sample MARE 1.9%)
+%   - Solar scaling and annual doses from real CARI-7 (HCP 1141 / 275 MV)
+%   - Machine-learning tier removed; physics corrected (SC25 max Oct 2024;
+%     GLE 77 acknowledged; H*(10)/E over-claim removed)
+%=======================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{textcomp}
+\usepackage{tabularx}
+\usepackage[round,authoryear]{natbib}
+\usepackage{lineno}
+\usepackage{setspace}
+\usepackage{hyperref}
+\onehalfspacing
+\linenumbers
+\setlength{\emergencystretch}{3em}
+\newcommand{\uSvh}{\,\textmu Sv\,h$^{-1}$}
+\newcommand{\mSvy}{\,mSv\,yr$^{-1}$}
+
+\title{\bfseries A minimum-data altitude--latitude formula for rapid
+screening of aircrew cosmic-radiation dose, derived from CARI-7}
+
+\author{%
+Doo-Hee Lee\textsuperscript{1}, Jung-Mi Park\textsuperscript{1},
+Ho Sub Chi\textsuperscript{1}, Jin Yoo\textsuperscript{1},
+Myeongsik Shin\textsuperscript{1}, Hyunsung Kim\textsuperscript{1},\\
+Jun Yoo\textsuperscript{1}, Dongyoul Lee\textsuperscript{2},
+Ku Kang\textsuperscript{1,$*$}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent\textsuperscript{1}CBRN Defense Research Institute, Ministry of
+National Defense, Seoul 06796, Republic of Korea.\\
+\textsuperscript{2}Department of Physics and Chemistry, Korea Military
+Academy, Seoul 01805, Republic of Korea.\\
+\textsuperscript{$*$}Corresponding author: bisu9082@gmail.com
+
+%-----------------------------------------------------------------------
+\begin{abstract}
+\noindent
+Aircrew are occupationally exposed, yet screening which profiles need
+monitoring still relies on detailed route-based codes. We derive a
+minimum-data screening formula for cosmic-radiation effective dose rate
+from the FAA CARI-7 model. Over the FL200--FL400 cruise band the dose rate
+follows a compact log-quadratic in altitude,
+$\ln D=-0.0232\,h_{\rm km}^{2}+0.701\,h_{\rm km}-4.172$, with a mean
+absolute relative error (MARE) of 0.10\% against CARI-7 (1.05\% over
+FL100--FL400), from altitude alone. A saturation-type geomagnetic
+correction, $f_{\rm lat}(R_c)=(1+aR_{c,\rm ref}^{\,n})/(1+aR_c^{\,n})$
+($a=0.024$, $n=1.52$), was fitted to CARI-7 rates at eleven nodes spanning
+$R_c=0$--17\,GV and reproduces three held-out nodes with an out-of-sample
+MARE of 1.9\%. All values are real CARI-7 (v4.1.3) executions; the formula
+reproduces CARI-7 and is not an independent measurement validation. Annual
+effective doses near 40{,}000\,ft reach 1.7--2.2\,mSv\,yr$^{-1}$, and routes
+with $R_c\lesssim7.3$\,GV at FL300 cross the 1\,mSv\,yr$^{-1}$ public
+reference level. On five real routes the screen reproduces CARI-7
+full-flight doses to within 8\% (long-haul) and matches its
+1\,mSv\,yr$^{-1}$ flag. It is a pocket-calculator complement to full
+route-based dosimetry.
+\end{abstract}
+
+\vspace{0.4em}
+\noindent\textbf{Keywords:} \textbf{cosmic radiation} / \textbf{aircrew
+dosimetry} / \textbf{CARI-7} / \textbf{geomagnetic cutoff rigidity} /
+\textbf{dose screening}
+
+%-----------------------------------------------------------------------
+\section{Introduction}
+
+Galactic cosmic radiation (GCR) is a pervasive radiological hazard at
+aviation altitudes, where the shielding column of overlying atmosphere is
+substantially reduced \citep{obrien1997atmospheric,icrp2007}; the same
+primary flux drives atmospheric ionization and cosmogenic-nuclide
+production \citep{makrantoni2022,environ}. At cruising altitudes the
+effective dose rate exceeds sea-level background by one to three orders of
+magnitude \citep{pelliccioni2000,ferrari1997,lindborg2004}, and
+international bodies classify aircrew as an occupationally exposed
+population requiring systematic dose assessment
+\citep{icrp2007,icrp1991,icrp132}. Epidemiological cohorts of aircrew
+sustain this concern \citep{hammer2009,grajewski2011,dreger2020}. In the
+European Union, Council Directive 2013/59/Euratom (Article 35) requires
+assessment of aircrew exposure where the effective dose is liable to exceed
+1\,mSv\,yr$^{-1}$ \citep{eudirective2013}. The same secondary field also
+drives single-event effects in avionics and microelectronics as device
+sizes shrink \citep{normand1996,dyerqinetiq2007}.
+
+Operational dose assessment is well served by physics-based route codes:
+the FAA CARI-7 suite \citep{anic2016,copeland2008}, the European EPCARD and
+AVIDOS systems \citep{latocha2016}, the French SIEVERT operational service
+\citep{sievert,clairand2009sievert,bottollier2006}, the NAIRAS real-time
+model \citep{mertens2013}, and the PHITS-based PARMA/EXPACS model
+\citep{sato2015parma}. Analytical and measurement-based representations of
+the global aviation dose field have also been developed from the NAIRAS
+model and the ARMAS in-flight database
+\citep{tobiska2018,meier2018,meier2014swindex,phoenix2026}. These tools and
+representations are accurate but require route geometry, date, and, in most
+cases, software or network access.
+
+A distinct and practically important need is \emph{rapid, minimum-data
+screening}: a first-pass estimate of which flight profiles may warrant
+closer monitoring, obtainable from flight altitude alone, for crew
+briefing, retrospective analysis from flight logs, or resource-limited
+settings. Compact dose terms are already used in our group's downstream
+frameworks---offline network-denied dose assessment \citep{resil} and an
+aircrew cochlear-risk model with a CARI-7-derived dose term
+\citep{lee2026cochlear}---motivating a documented screening formula. The increase of dose rate with
+altitude is well established \citep{lindborg2004,schraube1998}, and compact
+altitude--dose relations have been reported for particular latitude bands
+and national airspaces
+\citep{vukovic2022,bartlett2004,zarrouk2008,makrantoni2022}. Our aim is not
+to introduce a new dose
+model but to provide a transparent, pocket-calculator screening
+approximation that is tied explicitly to a recognised reference (CARI-7)
+and that carries an honest statement of its error and validity range.
+Existing compact forms meet only part of this need: operational services
+such as SIEVERT are not reducible to a hand calculation, published
+analytical representations of the dose field still require software
+\citep{tobiska2018,meier2018}, and reported exponential altitude relations
+are single-band and are not accompanied by an out-of-sample error budget
+\citep{vukovic2022,bartlett2004}. To our knowledge, no prior work provides
+a single hand-evaluable expression, anchored to a named reference code and
+validated out-of-sample, that spans both altitude and geomagnetic
+latitude.
+
+The objectives of this study are: (i) to derive, from CARI-7, a compact
+closed-form altitude expression for the FL200--FL400 cruise band and
+quantify how closely it reproduces the reference; (ii) to add a
+geomagnetic cutoff-rigidity correction, fitted and independently tested
+against CARI-7, so the screen applies from polar to equatorial routes;
+(iii) to use the resulting formula to flag flight profiles whose annual
+dose approaches or exceeds the 1\,mSv\,yr$^{-1}$ public reference level; and
+(iv) to characterise, from the same CARI-7 runs, the structure that such a
+factorised screen relies on---altitude--rigidity separability, the
+altitude-independence of solar modulation, and the altitude-dependence of
+the logarithmic dose gradient.
+
+%-----------------------------------------------------------------------
+\section{Materials and methods}
+
+\subsection{CARI-7 reference dataset}
+\label{sec:cari7}
+Reference effective-dose rates were generated with CARI-7 (version 4.1.3),
+the physics-based GCR model maintained by the FAA Civil Aerospace Medical
+Institute \citep{anic2016,copeland2008,faacari7}, whose atmospheric
+response functions were computed with MCNPX~2.7.0. All values reported here
+are direct CARI-7 executions. We used ICRP Publication~103 effective dose
+from all particles (the program's effective-dose tally, consistent with
+fluence-to-dose conventions, \citealp{ferrari1997}), the 2004 ISO/Nymmik
+GCR local interstellar spectrum, and monthly-average mode; solar modulation
+is set by the heliocentric potential (HCP), a heliospheric-modulation proxy
+\citep{caballero2004,usoskin2017}, from the program's date-indexed FAA
+table \citep{faahcp}. For each case the program returns the vertical cutoff
+rigidity ($R_c$) of the location and the effective dose rate.
+
+The references correspond to Korean Peninsula airspace (Incheon,
+$37.47^{\circ}$N, $126.45^{\circ}$E), for which CARI-7 returns
+$R_{c,\rm ref}=10.52$\,GV (2025 epoch). The nominal solar input was
+November~2025, HCP\,$=1{,}141$\,MV (a solar-maximum-phase month of Solar
+Cycle~25; the smoothed maximum was October~2024, \citealp{sidc2025}). GCR
+dose is \emph{lowest} near solar maximum, so this reference is the lower
+bound; a solar-minimum reference (January~2020, HCP\,$=275$\,MV) gives the
+conservative upper bound (Section~\ref{sec:annual}). The framework is a
+quiet-time GCR baseline and excludes SEP events and ground-level
+enhancements, such as GLE~77 (11~November~2025) \citep{gle77}, which
+require real-time systems such as NAIRAS and WASAVIES \citep{mertens2013}.
+
+A vertical altitude profile was computed at Incheon from 10{,}000 to
+40{,}000\,ft in 5{,}000\,ft steps (seven levels). For the latitude
+correction, effective-dose rates at FL300 were computed at eleven
+geographic locations spanning polar to equatorial routes
+(Section~\ref{sec:flat}), with three additional locations reserved as a
+held-out test set. Vertical altitude profiles were additionally computed
+at a polar (Svalbard, $R_c=0.03$\,GV) and an equatorial (Singapore,
+$R_c=17.2$\,GV) location to test the altitude--rigidity separability
+assumption directly (Section~\ref{sec:latext}).
+
+\subsection{Altitude screening formula}
+\label{sec:empformula}
+Over the operational FL200--FL400 band the altitude--dose relation was fit
+by least squares as a second-order polynomial in $\ln D$ versus altitude
+$h$ (km), using the five cruise-band CARI-7 nodes. A quadratic (rather than
+a single exponential, i.e.\ a linear $\ln D$--$h$ law) is required because
+the logarithmic dose gradient decreases steadily with altitude as the
+secondary cascade approaches its transition region. Fit quality is reported
+as the mean absolute relative error (MARE) against CARI-7.
+
+\subsection{Geomagnetic latitude correction}
+\label{sec:flat}
+A latitude correction $f_{\rm lat}(R_c)=D(R_c)/D(R_{c,\rm ref})$ was
+derived from FL300 effective-dose rates computed directly with CARI-7 at
+eleven geographic nodes whose returned vertical cutoff rigidities
+\citep{smart2009cutoff} span $R_c=0.0$--17.2\,GV (Table~\ref{tab:nodes}),
+normalised to the Incheon
+reference ($R_{c,\rm ref}=10.52$\,GV). A saturation model
+$f_{\rm lat}(R_c)=(1+aR_{c,\rm ref}^{\,n})/(1+aR_c^{\,n})$ was fitted and
+compared with a power law and an exponential decay; parameter uncertainty
+was obtained by bootstrap resampling ($B=10{,}000$). The fitted model was
+then tested on three held-out nodes (Munich, Rome, Tokyo; $R_c=4.0$, 6.3,
+11.3\,GV) that were not used in the fit, giving an out-of-sample error.
+Longitudinal variation at fixed $R_c$ (east--west effect, South Atlantic
+Anomaly) is a second-order effect and is not modelled; the altitude--$R_c$
+separation is tested directly in Section~\ref{sec:latext}.
+
+\subsection{Annual dose and regulatory context}
+\label{sec:annual}
+Annual effective doses were estimated for four altitude levels by
+multiplying CARI-7 mean dose rates by indicative annual flight hours.
+Three solar scenarios were used, all from real CARI-7 runs: nominal solar
+maximum (HCP\,$=1{,}141$\,MV), solar minimum (HCP\,$=275$\,MV), and a
+conservative upper bound (solar minimum $\times1.15$). Projections were
+compared with the ICRP public reference level (1\,mSv\,yr$^{-1}$;
+\citealp{icrp2007}) and the Korean aircrew management criterion
+(6\,mSv\,yr$^{-1}$; \citealp{knssc2021}); reference levels for highly
+exposed aircrew are typically 5--10\,mSv\,yr$^{-1}$ \citep{icrp132}. The
+1\,mSv\,yr$^{-1}$ value is used here as a conservative screening action
+threshold, not as the applicable aircrew dose limit.
+
+\subsection{Consistency with CARI-7 and published literature}
+\label{sec:consistency}
+We do not claim an independent validation against in-flight measurements.
+CARI-7 is itself validated against tissue-equivalent proportional counter
+and silicon-detector measurements
+\citep{badhwar2002,dachev2010,bennett2013,waker2019,dyer2007} and in
+cross-code and in-flight intercomparisons
+\citep{eurados2012,bottollier2004,deangelis2009,matthia2014pandoca,meier2018},
+which agree to within about $\pm30\%$. The screen is instead
+evaluated by how closely it reproduces CARI-7, including an out-of-sample
+test on held-out latitude nodes (Section~\ref{sec:flat}). Published
+in-flight dose rates at comparable geomagnetic conditions
+\citep{lee2015cosmic,spurny2001,matthia2014pandoca} are discussed
+qualitatively as context; a strict quantitative comparison is limited by
+the conversion between the measured ambient dose equivalent $H^*(10)$ and
+the CARI-7 effective dose $E$, whose operational-quantity ratio at aviation
+altitudes is close to unity but carries appreciable spread, and by the
+reference dosimetry standard in use \citep{icru84,iso207851}. We therefore
+treat the measurement literature as supporting the reference rather than as
+a direct test of the screening formula.
+
+\subsection{Use of artificial-intelligence tools}
+Large-language-model assistance (Anthropic Claude) was used for LaTeX
+editing, figure-generation code, and language polishing. All study design,
+CARI-7 executions, numerical results, and conclusions are the authors' own
+and were checked by the authors; no text or data were accepted without
+verification.
+
+%-----------------------------------------------------------------------
+\section{Results}
+
+\subsection{Altitude screening formula}
+The cruise-band fit (Figure~\ref{fig:alt}) is
+\begin{equation}
+  \ln D\,(\text{\textmu Sv\,h}^{-1})
+  = -0.0232\,h_{\rm km}^{2} + 0.701\,h_{\rm km} - 4.172,
+  \label{eq:logquad}
+\end{equation}
+with $h_{\rm km}$ the altitude in kilometres. Over the FL200--FL400 band
+Equation~\ref{eq:logquad} reproduces the CARI-7 reference with
+MARE\,$=0.10\%$ (maximum residual $0.2\%$; Table~\ref{tab:ef}); refitting
+over the extended FL100--FL400 range gives
+$\ln D=-0.0217\,h_{\rm km}^{2}+0.673\,h_{\rm km}-4.059$ with
+MARE\,$=1.05\%$. The local logarithmic gradient
+$d\ln D/dh$ falls from $\approx0.38$\,km$^{-1}$ near FL200 to
+$\approx0.17$\,km$^{-1}$ near FL400, so a single exponential
+(constant-gradient) law cannot reproduce the band; the quadratic term
+captures this curvature while remaining a closed-form pocket calculation.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figure1.eps}
+\caption{Altitude--dose-rate relation from CARI-7 (Incheon,
+$R_c=10.52$\,GV, HCP\,$=1{,}141$\,MV). The log-quadratic screen
+(Equation~\ref{eq:logquad}) is drawn solid over its calibrated FL200--FL400
+band and dotted outside it. Open circles are CARI-7 executions; the
+secondary axis is altitude in thousands of feet.}
+\label{fig:alt}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption{CARI-7 reference dose rates and the log-quadratic screen
+(Equation~\ref{eq:logquad}) over the FL200--FL400 cruise band (Incheon,
+$R_c=10.52$\,GV, HCP\,$=1{,}141$\,MV). RE\,$=$\,(screen$-$CARI-7)/CARI-7.}
+\label{tab:ef}
+\small
+\begin{tabular}{lccccc}
+\hline\hline
+\textbf{Profile} & \textbf{Alt. (ft)} & \textbf{Alt. (km)} &
+\textbf{CARI-7} & \textbf{Screen} & \textbf{RE} \\
+ & & & (\textmu Sv\,h$^{-1}$) & (\textmu Sv\,h$^{-1}$) & (\%) \\
+\hline
+Very high & 40{,}000 & 12.19 & 2.506 & 2.504 & $-0.1$ \\
+High      & 35{,}000 & 10.67 & 1.931 & 1.933 & $+0.1$ \\
+Reference & 30{,}000 & 9.14  & 1.340 & 1.340 & $+0.0$ \\
+Medium    & 25{,}000 & 7.62  & 0.835 & 0.834 & $-0.2$ \\
+Low edge  & 20{,}000 & 6.10  & 0.465 & 0.466 & $+0.1$ \\
+\hline
+\multicolumn{6}{@{}p{0.95\linewidth}@{}}{\footnotesize MARE $=0.10\%$ over
+FL200--FL400 (five nodes). Below FL200 the FL100--FL400 refit should be
+used (MARE $1.05\%$; see text).}\\
+\hline\hline
+\end{tabular}
+\end{table}
+
+\subsection{Solar-cycle modulation}
+CARI-7 runs at the solar-minimum reference (HCP\,$=275$\,MV) give dose
+rates a uniform $+15\%$ above the solar-maximum reference across all
+altitudes (e.g.\ $+15.2\%$ at both FL300 and FL400), consistent with the
+12--20\% full-cycle span reported elsewhere
+\citep{mertens2013,clairand2023,dobynde2021} and with heliospheric
+modulation theory \citep{caballero2004,usoskin2017}. Because the scaling is
+nearly
+altitude-independent, it is well represented by a single logarithmic HCP
+term, $1-\alpha\ln(\text{HCP}/\text{HCP}_{\rm ref})$ with
+$\alpha=0.108$ (Section~\ref{sec:latext}). Altitude is therefore the
+dominant predictor at any phase of the cycle, with solar modulation a
+second-order correction.
+
+\subsection{Annual doses and regulatory screening}
+Operations sustained at $\sim$40{,}000\,ft (672\,h\,yr$^{-1}$) give
+1.68--2.23\,mSv\,yr$^{-1}$, exceeding the 1\,mSv\,yr$^{-1}$ public
+reference level under all three solar scenarios (Figure~\ref{fig:annual},
+Table~\ref{tab:annual}). Standard widebody cruise at $\sim$30{,}000\,ft
+(576\,h\,yr$^{-1}$) gives 0.77--1.02\,mSv\,yr$^{-1}$, crossing the
+threshold only under the conservative scenario; operations at or below
+20{,}000\,ft remain well below all thresholds. These values are consistent
+with reported long-haul aircrew doses and national per-capita estimates
+\citep{grajewski2011,hammer2009,clairand2023,copeland2008,yasuda2018,hubert2018,zarrouk2008,bennett2013}
+and should be read as a screening trigger for closer monitoring, not as
+evidence of health effects.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figure3.eps}
+\caption{Estimated annual effective dose by altitude and solar scenario,
+from CARI-7 dose rates and indicative annual flight hours. Dashed line:
+ICRP public reference level (1\,mSv\,yr$^{-1}$).}
+\label{fig:annual}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption{Annual effective dose (mSv\,yr$^{-1}$) by altitude and solar
+scenario, from real CARI-7 dose rates. $\dagger$ exceeds the
+1\,mSv\,yr$^{-1}$ public reference level; conservative $=$ solar
+minimum $\times1.15$.}
+\label{tab:annual}
+\small
+\begin{tabular}{lcccc}
+\hline\hline
+\textbf{Altitude} & \textbf{h\,yr$^{-1}$} & \textbf{Nominal} &
+\textbf{Solar min} & \textbf{Conservative} \\
+\hline
+$\sim$40{,}000\,ft & 672 & 1.684$^\dagger$ & 1.940$^\dagger$ & 2.231$^\dagger$ \\
+$\sim$30{,}000\,ft & 576 & 0.772 & 0.889 & 1.022$^\dagger$ \\
+$\sim$20{,}000\,ft & 360 & 0.168 & 0.194 & 0.223 \\
+$\sim$10{,}000\,ft & 600 & 0.067 & 0.077 & 0.089 \\
+\hline\hline
+\end{tabular}
+\end{table}
+
+\subsection{Geomagnetic latitude extension}
+\label{sec:latext}
+Within the Korean mid-latitude envelope altitude dominates, but cutoff
+rigidity becomes a first-order correction toward the poles (lower $R_c$,
+higher dose) and the equator (higher $R_c$, lower dose). Fitting the
+eleven-node correction factor (Table~\ref{tab:nodes}), the saturation
+model was preferred ($R^2=0.996$) over a power law and an exponential
+decay. Bootstrap resampling ($B=10{,}000$) gave $\hat a=0.025$
+(95\% CI 0.012--0.046) and $\hat n=1.50$ (95\% CI 1.27--1.78). The
+complete screen combines the altitude base, the latitude factor, and a
+logarithmic HCP term:
+\begin{equation}
+  D(h,R_c,\text{HCP}) = D_{\rm alt}(h)
+  \,\frac{1+a R_{c,\rm ref}^{\,\hat n}}{1+a R_c^{\,\hat n}}
+  \,\bigl[1-\alpha\ln(\text{HCP}/\text{HCP}_{\rm ref})\bigr],
+  \label{eq:full}
+\end{equation}
+with $D_{\rm alt}(h)$ from Equation~\ref{eq:logquad}, $a=0.024$,
+$\hat n=1.52$, and $\alpha=0.108$. On the eleven fitted nodes the latitude
+factor has an in-sample MARE of 3.4\%; on the three held-out nodes the
+out-of-sample MARE is 1.9\% (Figure~\ref{fig:fig6}), a genuine test of the
+fitted form. The correction spans a factor of 2.5 between polar
+($f_{\rm lat}=1.81$) and equatorial ($f_{\rm lat}=0.73$) nodes.
+
+Applied at FL300 for 600\,h\,yr$^{-1}$, the fitted model places the
+1\,mSv\,yr$^{-1}$ crossover near $R_c\approx7.3$\,GV: estimated annual
+doses range from 1.48\,mSv\,yr$^{-1}$ on polar routes ($R_c\to0$) to
+0.53\,mSv\,yr$^{-1}$ on equatorial routes ($R_c\approx17$\,GV). The Korean
+reference itself (0.80\,mSv\,yr$^{-1}$ at FL300 on this basis) falls below
+the threshold, consistent with Section~\ref{sec:annual}.
+
+The screen multiplies a single altitude shape (Equation~\ref{eq:logquad})
+by the latitude factor, which assumes the altitude profile is invariant
+with cutoff rigidity. CARI-7 altitude profiles computed directly at a
+polar ($R_c=0.03$\,GV) and an equatorial ($R_c=17.2$\,GV) location test
+this: the equatorial profile matches the reference shape to within
+MARE\,$=0.4\%$ over FL200--FL400, confirming separability at mid-to-low
+latitudes. Toward the geomagnetic pole the softer primary spectrum makes
+the profile steepen, and the separable screen deviates by up to $+9\%$
+(FL200) to $-9\%$ (FL400) there (MARE\,$=5.6\%$). The full screen is thus
+most accurate for $R_c\gtrsim4$\,GV; polar-route screening carries this
+additional $\sim$5--9\% separability uncertainty, which is acceptable for
+a first-pass flag but is stated explicitly.
+
+\begin{table}[htbp]
+\centering
+\caption{FL300 effective-dose rates computed with CARI-7 at eleven
+geographic nodes (HCP\,$=1{,}141$\,MV), with the vertical cutoff rigidity
+$R_c$ returned by CARI-7 and the resulting
+$f_{\rm lat}=D/D_{\rm ref}$ ($D_{\rm ref}=1.340$\,\textmu Sv\,h$^{-1}$ at
+$R_{c,\rm ref}=10.52$\,GV).}
+\label{tab:nodes}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{cccl}
+\hline\hline
+\textbf{$R_c$ (GV)} & \textbf{$D$ (\textmu Sv\,h$^{-1}$)} &
+\textbf{$f_{\rm lat}$} & \textbf{Representative location} \\
+\hline
+0.00 & 2.425 & 1.810 & Resolute Bay (74.7$^\circ$N) \\
+0.03 & 2.425 & 1.810 & Svalbard (78.3$^\circ$N) \\
+0.48 & 2.425 & 1.810 & Keflav\'ik (64.0$^\circ$N) \\
+1.85 & 2.398 & 1.790 & Glasgow (55.9$^\circ$N) \\
+3.74 & 2.175 & 1.624 & Paris (49.0$^\circ$N) \\
+4.86 & 2.010 & 1.501 & Zagreb (45.7$^\circ$N) \\
+8.34 & 1.573 & 1.175 & Athens (37.9$^\circ$N) \\
+10.52 & 1.340 & 1.000 & Incheon / Korea (reference) \\
+15.91 & 1.024 & 0.764 & Hong Kong (22.3$^\circ$N) \\
+16.79 & 0.988 & 0.738 & Manila (14.5$^\circ$N) \\
+17.21 & 0.971 & 0.725 & Singapore (1.4$^\circ$N) \\
+\hline\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figure6.eps}
+\caption{Geomagnetic latitude extension. (a)~Correction factor
+$f_{\rm lat}(R_c)$ from the eleven CARI-7 fit nodes (circles) with the
+saturation model; three held-out nodes (triangles) are overplotted.
+(b)~Bootstrap distribution of the exponent $\hat n$ ($B=10{,}000$):
+$\hat n=1.50$, 95\% CI [1.27, 1.78]. (c)~Screen vs.\ CARI-7 for the
+in-sample (MARE 3.4\%) and held-out (MARE 1.9\%) nodes.}
+\label{fig:fig6}
+\end{figure}
+
+\subsection{Application to operational routes}
+\label{sec:routes}
+To test the screen as a decision tool, CARI-7 full great-circle doses were
+computed for five real routes from Incheon (RKSI) spanning the latitude
+range (Table~\ref{tab:routes}). The screen applies Equation~\ref{eq:full}
+at the cruise flight level and the great-circle-midpoint cutoff rigidity,
+multiplied by block time---inputs a user has without running any code. For the four long-haul routes the hand formula
+reproduces the CARI-7 route dose to within $-2\%$ to $+8\%$. The short
+domestic sector (ICN--CJU) is overestimated by 54\%, as expected where
+climb and descent dominate a cruise-based screen, but its absolute dose
+($<1$\,\textmu Sv) is negligible. Most importantly, for a representative
+crew schedule the screen and CARI-7 return the \emph{same}
+1\,mSv\,yr$^{-1}$ exceedance flag on all five routes: the trans-polar
+(ICN--JFK), trans-Siberian (ICN--FRA) and North-Pacific (ICN--LAX)
+long-haul rotations are flagged, the equatorial (ICN--SIN) and domestic
+(ICN--CJU) sectors are not.
+
+\begin{table}[htbp]
+\centering
+\caption{CARI-7 full great-circle effective dose for five routes from
+Incheon (Nov 2025, HCP\,$=1{,}141$\,MV) and the screen
+(Equation~\ref{eq:full}) evaluated at the cruise flight level and the
+great-circle-midpoint cutoff rigidity, multiplied by block time.}
+\label{tab:routes}
+\small
+\begin{tabular}{lccccc}
+\hline\hline
+\textbf{Route} & \textbf{Cruise} & \textbf{$R_{c,\rm mid}$} &
+\textbf{Block} & \textbf{Screen} & \textbf{CARI-7} \\
+ & (FL) & (GV) & (h) & (\textmu Sv) & (\textmu Sv) \\
+\hline
+ICN--JFK (polar)       & 350 & 0.01  & 14.2 & 50.4 & 47.3 \\
+ICN--FRA (trans-Siberia)& 370 & 1.27  & 11.7 & 45.1 & 42.6 \\
+ICN--LAX (N.\ Pacific) & 360 & 2.89  & 11.2 & 37.7 & 35.0 \\
+ICN--SIN (equatorial)  & 370 & 16.37 & 6.7  & 10.1 & 10.3 \\
+ICN--CJU (domestic)    & 280 & 11.31 & 1.0  & 1.1  & 0.69 \\
+\hline
+\multicolumn{6}{@{}p{0.95\linewidth}@{}}{\footnotesize Long-haul RE
+(screen$-$CARI-7): $+6.6\%$ (JFK), $+5.8\%$ (FRA), $+7.7\%$ (LAX),
+$-2.2\%$ (SIN). ICN--CJU $+54\%$ (climb/descent-dominated; dose
+negligible). The 1\,mSv\,yr$^{-1}$ annual flag agrees with CARI-7 on all
+five routes.}\\
+\hline\hline
+\end{tabular}
+\end{table}
+
+%-----------------------------------------------------------------------
+\section{Discussion}
+
+The curvature of $\ln D$ with altitude (Equation~\ref{eq:logquad}) is
+physically expected: the logarithmic gradient flattens as the secondary
+cascade approaches its transition region \citep{schraube1998}, so
+single-exponential relations fitted over particular bands
+\citep{vukovic2022,bartlett2004} are band-dependent. The second-order term
+reproduces CARI-7 across FL200--FL400 to 0.1\% (FL100--FL400 to
+$\sim$1\%) while remaining hand-evaluable.
+
+The contribution is deliberately modest and operational. Full route codes
+(CARI-7, EPCARD, AVIDOS, SIEVERT) and global-dose-field representations
+\citep{tobiska2018,meier2018,phoenix2026} remain the tools of record for
+regulatory dosimetry; what they do not provide is a single closed-form
+expression, evaluable without software or network access, for a first-pass
+screen of which profiles approach the 1\,mSv\,yr$^{-1}$ action level.
+Equations~\ref{eq:logquad} and~\ref{eq:full} supply that screen with a
+stated $\le1\%$ reproduction of CARI-7 in altitude and a held-out-tested
+latitude factor---to our knowledge the first hand-evaluable screen anchored
+to a named reference code and validated out-of-sample across both altitude
+and latitude. It is of practical value for crew briefing, retrospective
+estimation from flight logs, and resource-limited operations.
+
+Beyond the formula, the CARI-7 runs characterise the structure any
+factorised screen depends on, with transferable results. First,
+altitude--rigidity separability is bounded: the normalised altitude profile
+is invariant to $\le1\%$ for $R_c\gtrsim4$\,GV and steepens by
+$\sim$5--9\% only toward the pole, so one altitude shape suffices outside
+polar routes. Second, full-cycle solar modulation is altitude-independent
+at $\sim$15\%, captured by a one-parameter logarithmic HCP term. Third, the
+logarithmic dose gradient falls monotonically with altitude (0.38 to
+0.17\,km$^{-1}$), so single-exponential screens are intrinsically
+band-limited. These are properties of the aviation dose field, not fit
+artefacts.
+
+Several limitations bound the intended use. The multiplicative
+altitude--$R_c$ separation carries the $\sim$5--9\% polar uncertainty
+quantified in Section~\ref{sec:latext}, and the latitude factor is tested
+out-of-sample over only three nodes, so a broader held-out set and
+cross-epoch testing would further constrain it. Finally, the framework is a
+quiet-time GCR baseline: SEP
+events and ground-level enhancements, and storm-time cutoff suppression,
+are outside its scope and require real-time systems such as NAIRAS and
+WASAVIES \citep{mertens2013,mewaldt2005,kubo2015wasavies,sato2018wasavies,meier2014swindex}.
+Extending and testing the screen
+against measured in-flight datasets spanning a range of latitudes,
+altitudes, and solar conditions would broaden its operational basis.
+
+%-----------------------------------------------------------------------
+\section{Conclusion}
+
+A compact log-quadratic in altitude,
+$\ln D=-0.0232\,h_{\rm km}^{2}+0.701\,h_{\rm km}-4.172$, reproduces the
+CARI-7 cruise-band effective-dose reference to within 0.1\% (1\% over
+FL100--FL400) and requires only flight altitude; a saturation-type
+cutoff-rigidity factor---fitted to direct CARI-7 runs at eleven nodes and
+validated on three held-out nodes to 1.9\%---and a logarithmic HCP term
+extend it across latitude and the solar cycle. Used as a screen, the
+formula flags sustained high-altitude operations
+(1.7--2.2\,mSv\,yr$^{-1}$ near 40{,}000\,ft) and lower-rigidity routes
+($R_c\lesssim7.3$\,GV at FL300) as exceeding the 1\,mSv\,yr$^{-1}$ public
+reference level. It is intended as a minimum-data complement to full
+route-based dosimetry, not as a replacement, and its stated error and
+validity range make its screening role explicit.
+
+%-----------------------------------------------------------------------
+\section*{Acknowledgments}
+This research was conducted as part of a project under the Ministry of
+National Defense of the Republic of Korea. Heliocentric-potential data
+were obtained from the FAA database derived from Apatity Cosmic Ray
+Station neutron measurements \citep{faahcp}; CARI-7 was provided by the
+FAA Civil Aerospace Medical Institute.
+
+\section*{Funding}
+This research received no external funding.
+
+\section*{Conflicts of interest}
+The authors declare no conflicts of interest.
+
+\section*{Data availability statement}
+The CARI-7 output files, derived data, and analysis code are archived on
+Zenodo (\url{https://doi.org/10.5281/zenodo.19560458}; CC-BY-4.0). All
+reference values are reproducible with the FAA CARI-7 tool (v4.1.3) using
+the parameters in Section~\ref{sec:cari7}: ICRP~103 effective dose, 2004
+ISO/Nymmik GCR spectrum, monthly-average mode, and the stated dates and
+coordinates.
+
+\section*{Author contribution statement}
+K.\ Kang: conceptualisation, methodology, software, writing.
+D.-H.\ Lee and D.\ Lee: supervision, funding acquisition, review.
+J.-M.\ Park, H.S.\ Chi, J.\ Yoo, M.\ Shin, H.\ Kim, J.\ Yoo:
+investigation, data curation, formal analysis, visualisation. All authors
+reviewed and approved the manuscript.
+
+\section*{Ethics approval}
+Not applicable (no human or animal subjects).
+
+\section*{Informed consent}
+Not applicable.
+
+%-----------------------------------------------------------------------
+\bibliographystyle{apalike}
+\bibliography{myref}
+
+\end{document}

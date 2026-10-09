@@ -1,0 +1,9 @@
+ FLIGHTS FROM KUROUTES.BIG                  
+ PARTICLE           38  DOSEKIND           2
+ GCR MODEL            4  SUPERPOSITION            0  YMD 0000/00/00
+ICN-JFK                        RKSI   KJFK    4.7281E+01     microSv, ICRP Pub. 103 EFFECTIVE DOSE  TOTAL     
+ICN-SIN                        RKSI   WSSS    1.0301E+01     microSv, ICRP Pub. 103 EFFECTIVE DOSE  TOTAL     
+ICN-FRA                        RKSI   EDDF    4.2635E+01     microSv, ICRP Pub. 103 EFFECTIVE DOSE  TOTAL     
+ICN-LAX                        RKSI   KLAX    3.5034E+01     microSv, ICRP Pub. 103 EFFECTIVE DOSE  TOTAL     
+ICN-CJU                        RKSI   RKPC    6.9169E-01     microSv, ICRP Pub. 103 EFFECTIVE DOSE  TOTAL     
+  REACHED END OF BIG FILE                    

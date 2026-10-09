@@ -1,5 +1,0 @@
-Aircraft_Type,Cruise_Altitude_ft,Dose_SolarMax_2025_uSv,Dose_SolarMin_2019like_uSv,Percent_Increase_SolarMin,HCP_SolarMax,HCP_SolarMin_estimate,Sunspot_Number_SolarMax_approx,Sunspot_Number_SolarMin_approx
-Reconnaissance,40000,17.76,20.0,12.6,1132,465,210,5
-Surveillance/AWACS,30000,11.1,12.4,11.7,1132,465,210,5
-Aerial Refueling,20000,2.36,2.7,14.4,1132,465,210,5
-Transport,10000,0.28,0.32,14.3,1132,465,210,5
